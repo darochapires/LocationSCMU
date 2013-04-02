@@ -3,12 +3,9 @@ package mpc.location;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -146,7 +143,7 @@ public class MainActivity extends Activity
 		toast.show();*/
 	}
 	
-	@SuppressWarnings("unchecked")
+//	@SuppressWarnings("unchecked")
 	public void calc(View view) {
 		List<ScanResult> results = manager.getScanResults();
 		
@@ -180,6 +177,7 @@ public class MainActivity extends Activity
 			Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
 		else
 			Toast.makeText(getApplicationContext(), "You are at room " + location, Toast.LENGTH_SHORT).show();
+		
 	}
 	
 	private Map<Integer, ScanResult> sortList(List<ScanResult> results) {
