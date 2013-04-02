@@ -53,4 +53,14 @@
         android:layout_marginTop="53dp" >
     </TableLayout>
 
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/button2"
+        android:layout_marginBottom="18dp"
+        android:onClick="calc"
+        android:text="Where am I?" />
+
 </RelativeLayout>

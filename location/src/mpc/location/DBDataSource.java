@@ -14,7 +14,7 @@ public class DBDataSource {
 	private SQLiteDatabase database;
 	private DatabaseHelper dbHelper;
 	private String[] allColumns = { DatabaseHelper.COLUMN_ID,
-			DatabaseHelper.LOCATION_NAME };
+			DatabaseHelper.ACCESSPOINT_ADDRESS };
 
 	public DBDataSource(Context context) {
 		dbHelper = new DatabaseHelper(context);
@@ -30,10 +30,10 @@ public class DBDataSource {
 
 	public LocationEntry createLocation(String location) {
 		ContentValues values = new ContentValues();
-		values.put(DatabaseHelper.LOCATION_NAME, location);
-		long insertId = database.insert(DatabaseHelper.TABLE_LOCATION, null,
+		values.put(DatabaseHelper.ACCESSPOINT_ADDRESS, location);
+		long insertId = database.insert(DatabaseHelper.TABLE_ACCESSPOINT, null,
 				values);
-		Cursor cursor = database.query(DatabaseHelper.TABLE_LOCATION,
+		Cursor cursor = database.query(DatabaseHelper.TABLE_ACCESSPOINT,
 				allColumns, DatabaseHelper.COLUMN_ID + " = " + insertId, null,
 				null, null, null);
 		cursor.moveToFirst();
@@ -52,7 +52,7 @@ public class DBDataSource {
 	public List<LocationEntry> getAllLocations() {
 		List<LocationEntry> locations = new ArrayList<LocationEntry>();
 
-		Cursor cursor = database.query(DatabaseHelper.TABLE_LOCATION,
+		Cursor cursor = database.query(DatabaseHelper.TABLE_ACCESSPOINT,
 				allColumns, null, null, null, null, null);
 
 		cursor.moveToFirst();

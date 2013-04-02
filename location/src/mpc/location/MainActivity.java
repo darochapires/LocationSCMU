@@ -1,7 +1,14 @@
 package mpc.location;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -11,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
@@ -111,13 +119,21 @@ public class MainActivity extends Activity
 	
 	public void save(View view) {
 		EditText editText = (EditText) findViewById(R.id.editText1);
+		
+		InputMethodManager imm = (InputMethodManager)getSystemService(
+			      Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+			
+		
 		String location = editText.getText().toString();
 		List<ScanResult> results = manager.getScanResults();
 		Iterator<ScanResult> it = results.iterator();
+		Context context = getApplicationContext();
 		while (it.hasNext())
 		{
 			ScanResult next = it.next();
-			db.insert_ap(next.BSSID, location, next.SSID, next.level);
+			Toast.makeText(getApplicationContext(), "" + next.level, Toast.LENGTH_SHORT).show();
+			db.insert_ap(context, next.BSSID, location, next.SSID, next.level);
 		}
 		
 		Toast.makeText(getApplicationContext(), location + " successfuly added!", Toast.LENGTH_SHORT).show();
@@ -130,11 +146,88 @@ public class MainActivity extends Activity
 		toast.show();*/
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void calc(View view) {
-		//TODO obter os 3 primeiros APs e calcular quais os mais pr—ximos
 		List<ScanResult> results = manager.getScanResults();
-		Iterator<ScanResult> it = results.iterator();
+		
+		Map<Integer, ScanResult> aps = new TreeMap<Integer, ScanResult>();
+		aps = sortList(results);
+		Map<String, Integer> locations = new HashMap<String,Integer>();
+        ValueComparator bvc =  new ValueComparator(locations);
+		Map<String, Integer> orderedLocations = new TreeMap<String, Integer>(bvc);
+		
+		Iterator<ScanResult> it = aps.values().iterator();
+		
+		for (int i = 0; i < 5; i++)
+		{
+			ScanResult next = it.next();
+			ReadingEntry reading = db.getResults(next.BSSID, next.level);
+			String loc = reading.getLocation();
+			if (locations.containsKey(loc))
+			{
+				Integer count = (Integer) locations.get(loc);
+				count++;
+				locations.put(loc, count);
+			}
+			else
+				locations.put(loc, 1);
+		}
+		
+		orderedLocations.putAll(locations);
+		String location = orderedLocations.keySet().iterator().next();
+		
+		if (location == null)
+			Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(getApplicationContext(), "You are at room " + location, Toast.LENGTH_SHORT).show();
 	}
 	
+	private Map<Integer, ScanResult> sortList(List<ScanResult> results) {
+		LevelComparator comp = new LevelComparator();
+		Map<Integer, ScanResult> map = new TreeMap<Integer, ScanResult>(comp);
+		Iterator<ScanResult> it = results.iterator();
+		while (it.hasNext())
+		{
+			ScanResult next = it.next();
+			map.put(next.level, next);
+		}
+		return map;
+	}
+	
+	class ValueComparator implements Comparator<String> {
+
+	    Map<String, Integer> base;
+	    public ValueComparator(Map<String, Integer> base) {
+	        this.base = base;
+	    }
+
+	    // Note: this comparator imposes orderings that are inconsistent with equals.    
+	    public int compare(String a, String b) {
+	        if (base.get(a) >= base.get(b)) {
+	            return 1;
+	        } else {
+	            return -1;
+	        } // returning 0 would merge keys
+	    }
+	}
+	
+	class LevelComparator implements Comparator<Integer> {
+
+		/*Map<Integer, ScanResult> base;
+	    public LevelComparator(Map<Integer, ScanResult> base) {
+	        this.base = base;
+	    }
+*/
+
+	    	    // Note: this comparator imposes orderings that are inconsistent with equals.    
+	    public int compare(Integer a, Integer b) {
+	        if (a >= b) {
+	            return -1;
+	        } else {
+	            return 1;
+	        } // returning 0 would merge keys
+	    }
+	}
+
 
 }
