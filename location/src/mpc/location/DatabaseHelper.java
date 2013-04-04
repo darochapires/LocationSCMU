@@ -11,11 +11,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private int ap_id;
 
-	/*
-		public static final String TABLE_LOCATION = "locations";
-		public static final String LOCATION_NAME = "name";
-	 */
-
 	public static final String COLUMN_ID = "_id";
 
 	public static final String TABLE_ACCESSPOINT = "accesspoints";
@@ -29,13 +24,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME = "accesspoints.db";
 	private static final int DATABASE_VERSION = 1;
-
-	// Database creation sql statement
-	/*private static final String CREATE_LOCATION = "create table "
-			+ TABLE_LOCATION + "(" + COLUMN_ID
-			+ " integer primary key autoincrement, " + LOCATION_NAME
-			+ " text not null);";
-	 */
 
 	private static final String CREATE_ACCESSPOINT = "create table "
 			+ TABLE_ACCESSPOINT + "(" + COLUMN_ID
@@ -71,28 +59,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public void insert_ap(Context context, String mac_address, String location, String name, int strength) {
+	//MŽtodo para inserir o AP e a respectiva Leitura
+	public void insert_ap(String mac_address, String location, String name, int strength) {
 		Cursor cursor = getReadableDatabase().rawQuery("select * from accesspoints where macaddress = ?",
 				new String[] { mac_address });
 
-		int found = cursor.getCount(); 
 		long ap_to_insert = 0;
 
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.clear();
-
-		if (found == 0)
+		//Verificar se o AP j‡ existe
+		if (!cursor.moveToFirst())
 		{
+			//Se n‹o existe, guardar em BD
 			values.put(ACCESSPOINT_ADDRESS, mac_address);
 
 			db.insertOrThrow(TABLE_ACCESSPOINT, null, values);
 			ap_id++;
+			//Indicar o ID do AP criado
 			ap_to_insert = ap_id;
 		}
 		else
 		{
-			cursor.moveToFirst();
+			//Caso j‡ exista, obter o ID do AP
 			ap_to_insert = cursor.getLong(0);
 		}
 
@@ -103,37 +93,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(READING_NAME, name);
 		values.put(READING_STRENGTH, strength);
 
+		//Inserir um novo tuplo para a leitura
 		db.insertOrThrow(TABLE_READING, null, values);
 	}
 
+	//MŽtodo que retorna o AP mais pr—ximo dado um MAC Address
 	public ReadingEntry getResults(String mac, int strength) {
+		//Procurar pelo AP com o MAC Address "mac"
 		Cursor ap_cursor = getReadableDatabase().rawQuery("select * from accesspoints where macaddress = ?", new String[] { mac });
+		//vari‡veis para o c‡lculo da dist‰ncia minima
 		double min_distance = Integer.MAX_VALUE;
 		double distance = 0;
+		//Posi‹o do AP mais pr—ximo encontrado
 		int pos = 0;
 		ReadingEntry reading = new ReadingEntry();
+		
+		//TODO DòVIDA! Caso o AP n‹o exista, cria-se o AP e a respectiva leitura?
+		
+		//Verificar se o MAC Address existe
 		if (ap_cursor.moveToFirst())
 		{
+			//ID do AP encontrado
 			String id = String.valueOf(ap_cursor.getLong(0));
 
+			//Procurar pelas leituras que correspondam ao AP encontrado
 			Cursor read_cursor = getReadableDatabase().
 					rawQuery("select * from reading where accesspoint_id = ? order by strength desc",
 							new String[] { id });
 
+			//Verificar se h‡ leituras
 			if (read_cursor.moveToFirst())
 			{
+				//Obter posi‹o da leitura
 				pos = read_cursor.getPosition();
-				while (!read_cursor.isAfterLast() && min_distance > distance)
+				while (!read_cursor.isAfterLast())
 				{
+					//Calcular a dist‰ncia com a euclediana
 					distance = Math.sqrt( Math.pow(read_cursor.getInt(3) - strength, 2));
+					//Verificar se encontr‡mos uma dist‰ncia m’nima
 					if (distance < min_distance)
 					{
+						//Em caso positivo, guardar o valor como m’nimo e respectiva posi‹o
 						min_distance = distance;
 						pos = read_cursor.getPosition();
 					}
 					read_cursor.moveToNext();
 				}
 
+				//Mover o cursor para a posi‹o da Leitura m’nima
 				read_cursor.moveToPosition(pos);
 
 				reading.setName(read_cursor.getString(read_cursor.getColumnIndex(READING_NAME)));

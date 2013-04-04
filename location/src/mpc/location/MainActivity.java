@@ -101,6 +101,7 @@ public class MainActivity extends Activity
 		}*/
 	}
 	
+	//Método para mostrar a caixa de texto
 	public void insert(View view) {	
 		EditText editText = (EditText) findViewById(R.id.editText1);
 		Button button = (Button) findViewById(R.id.button3);
@@ -114,84 +115,101 @@ public class MainActivity extends Activity
 		}
 	}
 	
+	//Método para guardar a localização dada pelo utilizador
 	public void save(View view) {
 		EditText editText = (EditText) findViewById(R.id.editText1);
 		
+		//Código manhoso que encontrei na net para esconder o teclado :P
 		InputMethodManager imm = (InputMethodManager)getSystemService(
 			      Context.INPUT_METHOD_SERVICE);
 			imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 			
-		
+		//Obter o texto inserido
 		String location = editText.getText().toString();
+		//Obter os resultados do scan
+		manager.startScan();
 		List<ScanResult> results = manager.getScanResults();
+		
+		//Para cada resultado guardar o AP e respectiva leitura
 		Iterator<ScanResult> it = results.iterator();
-		Context context = getApplicationContext();
 		while (it.hasNext())
 		{
 			ScanResult next = it.next();
-			Toast.makeText(getApplicationContext(), "" + next.level, Toast.LENGTH_SHORT).show();
-			db.insert_ap(context, next.BSSID, location, next.SSID, next.level);
+			db.insert_ap(next.BSSID, location, next.SSID, next.level);
 		}
 		
+		//Mensagem de sucesso
 		Toast.makeText(getApplicationContext(), location + " successfuly added!", Toast.LENGTH_SHORT).show();
-		
-		/*ScanResult result = it.next();
-		Context context = getApplicationContext();
-		int duration = Toast.LENGTH_SHORT;
-		APEntry ap = db.getResults(result.BSSID);
-		Toast toast = Toast.makeText(context, ap.getMacAddress(), duration);
-		toast.show();*/
 	}
 	
-//	@SuppressWarnings("unchecked")
+	//Método para calcular a localização do utilizador
 	public void calc(View view) {
+		//Obter os APs
+		manager.startScan();
 		List<ScanResult> results = manager.getScanResults();
 		
+		//Mapa para ordenar os APs pela força de sinal (do maior para o mais pequeno)
 		Map<Integer, ScanResult> aps = new TreeMap<Integer, ScanResult>();
 		aps = sortList(results);
+		
+		//Mapa para guardar o nº de ocorrência das localizações, ordenado por valor (do maior para o mais pequeno)
 		Map<String, Integer> locations = new HashMap<String,Integer>();
         ValueComparator bvc =  new ValueComparator(locations);
 		Map<String, Integer> orderedLocations = new TreeMap<String, Integer>(bvc);
 		
+		//Percorrer os APs
 		Iterator<ScanResult> it = aps.values().iterator();
-		
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < aps.size(); i++)
 		{
 			ScanResult next = it.next();
+			//Obter a leitura mais próxima para o AP "next"
 			ReadingEntry reading = db.getResults(next.BSSID, next.level);
+			//Obter a localização correspondente à leitura
 			String loc = reading.getLocation();
-			if (locations.containsKey(loc))
+			//Se estiver no mapa locations, incrementar o valor
+			if (loc != null && locations.containsKey(loc))
 			{
 				Integer count = (Integer) locations.get(loc);
 				count++;
 				locations.put(loc, count);
 			}
+			//Se não estiver no mapa locations, inserir com valor 1
 			else
 				locations.put(loc, 1);
 		}
 		
+		//Criar o mapa orderedLocations com os valores do mapa locations, para obtermos o mapa ordenado por valor
 		orderedLocations.putAll(locations);
+		//Obter a localização com maior nº de ocorrências
 		String location = orderedLocations.keySet().iterator().next();
 		
+		//Se não encontrar uma localização dar mensagem de erro
 		if (location == null)
 			Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+		//Se encontrar, retornar a localização
 		else
 			Toast.makeText(getApplicationContext(), "You are at room " + location, Toast.LENGTH_SHORT).show();
 		
 	}
 	
+	//Método para obter um mapa com os APs ordenados
 	private Map<Integer, ScanResult> sortList(List<ScanResult> results) {
+		//Criar o mapa com o comparador que ordena o mapa por força de sinal (do maior para o mais pequeno)
 		LevelComparator comp = new LevelComparator();
 		Map<Integer, ScanResult> map = new TreeMap<Integer, ScanResult>(comp);
+		
+		//Percorrer os APs da lista
 		Iterator<ScanResult> it = results.iterator();
 		while (it.hasNext())
 		{
+			//Para cada AP inserir no mapa
 			ScanResult next = it.next();
 			map.put(next.level, next);
 		}
 		return map;
 	}
 	
+	//Comparador para ordenar o mapa com as localizações por valor (do maior para o mais pequeno)
 	class ValueComparator implements Comparator<String> {
 
 	    Map<String, Integer> base;
@@ -209,13 +227,8 @@ public class MainActivity extends Activity
 	    }
 	}
 	
+	//Comparador para ordenar o mapa com os APs por força de sinal (do maior para o mais pequeno)
 	class LevelComparator implements Comparator<Integer> {
-
-		/*Map<Integer, ScanResult> base;
-	    public LevelComparator(Map<Integer, ScanResult> base) {
-	        this.base = base;
-	    }
-*/
 
 	    	    // Note: this comparator imposes orderings that are inconsistent with equals.    
 	    public int compare(Integer a, Integer b) {
