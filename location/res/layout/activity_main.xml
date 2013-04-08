@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/button4"
         android:layout_alignBottom="@+id/button4"
-        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@+id/button4"
         android:text="Prec" />
-
+    
 </RelativeLayout>

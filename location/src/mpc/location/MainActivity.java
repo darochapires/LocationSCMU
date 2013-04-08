@@ -1,11 +1,12 @@
 package mpc.location;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -15,6 +16,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Pair;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -80,10 +83,33 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		//getMenuInflater().inflate(R.menu.main, menu);
+		//return true;
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    return true;
 	}
 
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    case R.id.action_loc:
+	      Toast.makeText(this, "Menu Item 1 selected", Toast.LENGTH_SHORT)
+	          .show();
+	      break;
+	    case R.id.action_point:
+	      Toast.makeText(this, "Menu item 2 selected", Toast.LENGTH_SHORT)
+	          .show();
+	    case R.id.action_about:
+		      Toast.makeText(this, "Menu item 3 selected", Toast.LENGTH_SHORT)
+		          .show();
+	      break;
+
+	    default:
+	      break;
+	    }
+
+	    return true;
+	  } 
 	/** Called when the user clicks the Scan Now button */
 	public void scan(View view) {
 		// Do something in response to button
@@ -139,8 +165,6 @@ public class MainActivity extends Activity {
 		Toast.makeText(getApplicationContext(), point + " successfuly added!",
 				Toast.LENGTH_SHORT).show();
 	}
-	
-	
 
 	// Distancia Euclideana
 	public long euclidean(long x1, long x2, long y1, long y2) {
@@ -156,92 +180,80 @@ public class MainActivity extends Activity {
 
 	// MÈtodo para calcular a localizaÁ„o do utilizador
 	public void calc(View view) {
+		double min_distance = Double.MAX_VALUE;
+		double distance = 0;
+		int min_point = 0;
 		// Obter os APs
 		manager.startScan();
 		List<ScanResult> results = manager.getScanResults();
+		//Obter leitura ordenada por força de sinal
+		List<ScanResult> sortedResults = sortList(results);
 
-		List<Pair<PointEntry, List<APEntry>>> aps_per_point = db.getAPEntriesGivenMac(results);
+		ScanResult strongest = sortedResults.get(0);
 		
+		Map<Integer, List<APEntry>> aps_per_point = db.getAPEntriesGivenMac(strongest.BSSID, results);
+		Iterator<Integer> point_it = aps_per_point.keySet().iterator();
 		
-		
-//		Iterator<ScanResult> scansIterator = results.iterator();
-//		
-//		
-//		while(scansIterator.hasNext()){
-//			ScanResult scan = scansIterator.next();
-//			ReadingEntry reading = db.getResults(scan.BSSID, scan.level);
-//			
-//		}
-		
-
-//		// Mapa para ordenar os APs pela forÁa de sinal (do maior para o mais
-//		// pequeno)
-//		Map<Integer, ScanResult> aps = new TreeMap<Integer, ScanResult>();
-//		aps = sortList(results);
-//
-//		// Mapa para guardar o nÛ de ocorrÁncia das localizaÁ„es, ordenado por
-//		// valor (do maior para o mais pequeno)
-//		Map<String, Integer> locations = new HashMap<String, Integer>();
-//		ValueComparator bvc = new ValueComparator(locations);
-//		Map<String, Integer> orderedLocations = new TreeMap<String, Integer>(
-//				bvc);
-//
-//		// Percorrer os APs
-//		Iterator<ScanResult> it = aps.values().iterator();
-//		for (int i = 0; i < aps.size(); i++) {
-//			ScanResult next = it.next();
-//			// Obter a leitura mais prÛxima para o AP "next"
-//			ReadingEntry reading = db.getResults(next.BSSID, next.level);
-//			// Obter a localizaÁ„o correspondente ‡ leitura
-//			String loc = reading.getLocation();
-//			// Se estiver no mapa locations, incrementar o valor
-//			if (loc != null && locations.containsKey(loc)) {
-//				Integer count = (Integer) locations.get(loc);
-//				count++;
-//				locations.put(loc, count);
-//			}
-//			// Se n„o estiver no mapa locations, inserir com valor 1
-//			else
-//				locations.put(loc, 1);
-//		}
-//
-//		// Criar o mapa orderedLocations com os valores do mapa locations, para
-//		// obtermos o mapa ordenado por valor
-//		orderedLocations.putAll(locations);
-//		// Obter a localizaÁ„o com maior nÛ de ocorrÍncias
-//		String location = orderedLocations.keySet().iterator().next();
-//
-//		// Se n„o encontrar uma localizaÁ„o dar mensagem de erro
-//		if (location == null)
-//			Toast.makeText(getApplicationContext(), "Something went wrong",
-//					Toast.LENGTH_SHORT).show();
-//		// Se encontrar, retornar a localizaÁ„o
-//		else
-//			Toast.makeText(getApplicationContext(),
-//					"You are at room " + location, Toast.LENGTH_SHORT).show();
-
+		while (point_it.hasNext())
+		{
+			int point_id = point_it.next();
+			
+			Map<String, APEntry> aps = sortByMac(aps_per_point.get(point_id));
+			Iterator<ScanResult> results_it = results.iterator();
+			
+			double parcels = 0;
+			while (results_it.hasNext())
+			{
+				ScanResult result = results_it.next();
+				if (aps.containsKey(result.BSSID)){
+					APEntry ap = aps.get(result.BSSID);
+					parcels += Math.pow( result.level - ap.getStrength() , 2);
+				}
+				else
+					parcels += Math.pow( result.level - (-120) , 2);
+			}
+			
+			distance = Math.sqrt(parcels);
+			if (distance < min_distance)
+			{
+				min_distance = distance;
+				min_point = point_id;
+			}
+		}
+		PointEntry point = db.get_point(min_point);
+		Toast.makeText(getApplicationContext(), "You are at room " + point.getName(),
+				Toast.LENGTH_SHORT).show();
 	}
 
 	// MÈtodo para obter um mapa com os APs ordenados
-	private Map<Integer, ScanResult> sortList(List<ScanResult> results) {
+	private List<ScanResult> sortList(List<ScanResult> results) {
 		// Criar o mapa com o comparador que ordena o mapa por forÁa de sinal
 		// (do maior para o mais pequeno)
 		LevelComparator comp = new LevelComparator();
-		Map<Integer, ScanResult> map = new TreeMap<Integer, ScanResult>(comp);
+		List<ScanResult> list = new LinkedList<ScanResult>();
 
-		// Percorrer os APs da lista
-		Iterator<ScanResult> it = results.iterator();
-		while (it.hasNext()) {
-			// Para cada AP inserir no mapa
-			ScanResult next = it.next();
-			map.put(next.level, next);
+		Collections.sort(results,comp);
+
+        for( ScanResult result: results){
+            list.add(result);
+        } 
+		return list;
+	}
+	
+	private Map<String, APEntry> sortByMac(List<APEntry> results) {
+		Map<String, APEntry> map = new HashMap<String, APEntry>();
+		Iterator<APEntry> it = results.iterator();
+		while (it.hasNext())
+		{
+			APEntry next = it.next();
+			map.put(next.getMac_address(), next);
 		}
 		return map;
 	}
 
 	// Comparador para ordenar o mapa com as localizaÁ„es por valor (do maior
 	// para o mais pequeno)
-	class ValueComparator implements Comparator<String> {
+	/*class ValueComparator implements Comparator<String> {
 
 		Map<String, Integer> base;
 
@@ -258,16 +270,14 @@ public class MainActivity extends Activity {
 				return -1;
 			} // returning 0 would merge keys
 		}
-	}
+	}*/
 
 	// Comparador para ordenar o mapa com os APs por forÁa de sinal (do maior
 	// para o mais pequeno)
-	class LevelComparator implements Comparator<Integer> {
+	class LevelComparator implements Comparator<ScanResult> {
 
-		// Note: this comparator imposes orderings that are inconsistent with
-		// equals.
-		public int compare(Integer a, Integer b) {
-			if (a >= b) {
+		public int compare(ScanResult a, ScanResult b) {
+			if (a.level >= b.level) {
 				return -1;
 			} else {
 				return 1;

@@ -1,9 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_loc"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:showAsAction="ifRoom|withText"
+        android:title="Localizar"
+        />
+    
+    <item
+        android:id="@+id/action_point"
+        android:showAsAction="ifRoom|withText"
+        android:title="Guardar Pontos">
+    </item>
+    <item
+        android:id="@+id/action_about"
+        
+        android:showAsAction="ifRoom|withText"
+        android:title="Sobre">
+    </item>
 
 </menu>

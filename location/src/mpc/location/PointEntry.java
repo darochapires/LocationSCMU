@@ -4,6 +4,10 @@ public class PointEntry {
 
 	private int id;
 	private String point_name;
+	
+	public PointEntry() {
+		
+	}
 
 	public PointEntry(int id, String name) {
 		this.id = id;

@@ -1,9 +1,12 @@
 package mpc.location;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -78,167 +81,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.insertOrThrow(TABLE_ACCESSPOINT, null, values);
 	}
 
-	// Metodo que retorna o AP mais pr—ximo dado um MAC Address
-	public ReadingEntry getResults(String mac, int strength) {
-		// Procurar pelo AP com o MAC Address "mac"
-		Cursor ap_cursor = getReadableDatabase().rawQuery(
-				"select * from accesspoints where macaddress = ?",
-				new String[] { mac });
-		// variaveis para o calculo da distância minima
-		double min_distance = Integer.MAX_VALUE;
-		double distance = 0;
-		// Posicao do AP mais pr—ximo encontrado
-		int pos = 0;
-		ReadingEntry reading = new ReadingEntry();
-
-		// TODO DUVIDA! Caso o AP nao exista, cria-se o AP e a respectiva
-		// leitura?
-
-		// Verificar se o MAC Address existe
-		if (ap_cursor.moveToFirst()) {
-			// ID do AP encontrado
-			String id = String.valueOf(ap_cursor.getInt(0));
-
-			// Procurar pelas leituras que correspondam ao AP encontrado
-			Cursor read_cursor = getReadableDatabase()
-					.rawQuery(
-							"select * from reading where accesspoint_id = ? order by strength desc",
-							new String[] { id });
-
-			// Verificar se ha leituras
-			if (read_cursor.moveToFirst()) {
-				// Obter posicao da leitura
-				pos = read_cursor.getPosition();
-				while (!read_cursor.isAfterLast()) {
-					// Calcular a distancia com a euclediana
-					distance = Math.sqrt(Math.pow(read_cursor.getInt(3)
-							- strength, 2));
-					// Verificar se encontramos uma distancia minima
-					if (distance < min_distance) {
-						// Em caso positivo, guardar o valor como minimo e
-						// respectiva posicao
-						min_distance = distance;
-						pos = read_cursor.getPosition();
-					}
-					read_cursor.moveToNext();
-				}
-
-				// Mover o cursor para a posicao da Leitura minima
-				read_cursor.moveToPosition(pos);
-
-				// reading.setName(read_cursor.getString(read_cursor.getColumnIndex(READING_NAME)));
-				// reading.setLocation(read_cursor.getString(read_cursor
-				// .getColumnIndex(READING_LOCATION)));este
-				// reading.setStrength(read_cursor.getInt(read_cursor.getColumnIndex(READING_STRENGTH)));
-				// reading.setAp_id(read_cursor.getInt(read_cursor.getColumnIndex(READING_AP_ID)));
-			}
-		}
-		return reading;
-	}
-
 	/**
 	 * Esparguete ALERT! 
 	 * 1º obter todos os APs da bd que foram obtidos no scan;
 	 * 2º obter os pontos onde estes APs contam; 
 	 * 3º obter todos os APs destes pontos.
 	 */
-	public List<Pair<PointEntry, List<APEntry>>> getAPEntriesGivenMac(
+	public Map<Integer, List<APEntry>> getAPEntriesGivenMac(String mac,
 			List<ScanResult> results) {
 
-		List<Pair<PointEntry, List<APEntry>>> result = new ArrayList<Pair<PointEntry, List<APEntry>>>();
+		Map<Integer, List<APEntry>> result = new HashMap<Integer, List<APEntry>>();
 
-		String constraints = "";
-		Iterator<ScanResult> it = results.iterator();
+		Cursor ap_cursor = getReadableDatabase().rawQuery(
+				"select * from accesspoints where macaddress = ?",
+				new String[] { mac });
 
-		// se tiver um record...
-		if (it.hasNext()) {
-			ScanResult s = it.next();
-			constraints.concat(ACCESSPOINT_MACADDRESS + " = '" + s.BSSID + "'");
-
-			// se tiver mais records...
-			while (it.hasNext()) {
-				constraints.concat(" or ");
-				s = it.next();
-				constraints.concat(ACCESSPOINT_MACADDRESS + " = '" + s.BSSID
-						+ "'");
+		// esta list vai ter todos os APs que estao na BD com o mesmo
+		// macaddress que os APs do scan, caso constem na BD
+		// se se obtiveram resultados...
+		if (ap_cursor.moveToFirst()) {
+			List<Integer> points = new ArrayList<Integer>();
+			for (int i = 0; i < ap_cursor.getCount(); i++) {
+				points.add(ap_cursor.getInt(3));
 			}
-			constraints.concat(";");
 
-			// 1º obter todos os APs da bd que foram obtidos no scan
-			Cursor ap_cursor = getReadableDatabase().rawQuery(
-					"select * from accesspoints where ?",
-					new String[] { constraints });
+			// 2º obter os pontos onde estes APs constam
+			int point_id;
+			//String point_constraints = null;
+			for (int i = 0; i < points.size(); i++) {
+				//ap = itApEntries.next();
+				point_id = points.get(i);
+				Cursor aps_in_point_cursor = getReadableDatabase()
+						.rawQuery(
+								"select * from accesspoints where point_id = ?",
+								new String[] { point_id + "" });
 
-			// esta list vai ter todos os APs que estao na BD com o mesmo
-			// macaddress que os APs do scan, caso constem na BD
-			// se se obtiveram resultados...
-			if (ap_cursor.moveToFirst()) {
-				List<APEntry> apEntries = new ArrayList<APEntry>();
-				for (int i = 0; i < ap_cursor.getCount(); i++) {
-					APEntry ap = new APEntry(ap_cursor.getInt(0),
-							ap_cursor.getString(1), ap_cursor.getString(2),
-							ap_cursor.getInt(3), ap_cursor.getInt(4));
-					apEntries.add(ap);
-				}
-
-				// 2º obter os pontos onde estes APs constam
-				Iterator<APEntry> itApEntries = apEntries.iterator();
-				// List<PointEntry> points = new ArrayList<PointEntry>();
-				APEntry ap;
-				int point_id;
-				String point_constraints = null;
-				if (itApEntries.hasNext()) {
-					ap = itApEntries.next();
-					point_id = ap.getPointId();
-					point_constraints = POINT_ID + " = " + point_id;
-
-					while (itApEntries.hasNext()) {
-						ap = itApEntries.next();
-						point_id = ap.getPointId();
-						point_constraints.concat(" or " + POINT_ID + " = "
-								+ point_id);
+				if (aps_in_point_cursor.moveToFirst()) {
+					List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
+					for (int j = 0; j < aps_in_point_cursor.getCount(); j++) {
+						APEntry ap_in_point_entry = new APEntry(
+								aps_in_point_cursor.getInt(0),
+								aps_in_point_cursor.getString(1),
+								aps_in_point_cursor.getString(2),
+								aps_in_point_cursor.getInt(3),
+								aps_in_point_cursor.getInt(4));
+						aps_in_point_list.add(ap_in_point_entry);
 					}
-					point_constraints.concat(";");
-					Cursor points_cursor = getReadableDatabase().rawQuery(
-							"select * from points where ?",
-							new String[] { point_constraints });
-					// se se obtiveram resultados...
-					if (points_cursor.moveToFirst()) {
-
-						for (int i = 0; i < points_cursor.getCount(); i++) {
-							PointEntry p = new PointEntry(
-									points_cursor.getInt(0),
-									points_cursor.getString(1));
-
-							// 3º obter todos os APs destes pontos
-							Cursor aps_in_point_cursor = getReadableDatabase()
-									.rawQuery(
-											"select * from accesspoints where point_id = ?",
-											new String[] { p.getId() + "" });
-
-							if (aps_in_point_cursor.moveToFirst()) {
-								List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
-								for (int j = 0; j < aps_in_point_cursor
-										.getCount(); j++) {
-									APEntry ap_in_point_entry = new APEntry(
-											aps_in_point_cursor.getInt(0),
-											aps_in_point_cursor.getString(1),
-											aps_in_point_cursor.getString(2),
-											aps_in_point_cursor.getInt(3),
-											aps_in_point_cursor.getInt(4));
-									aps_in_point_list.add(ap_in_point_entry);
-								}
-								// par (point,APs desse point)
-								Pair<PointEntry, List<APEntry>> pair = new Pair<PointEntry, List<APEntry>>(
-										p, aps_in_point_list);
-								result.add(pair);
-							}
-						}
-					}
+					result.put(point_id, aps_in_point_list);
 				}
 			}
 		}
-
 		return result;
 	}
 
@@ -265,5 +157,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			id_to_return = current_point_id;
 		}
 		return id_to_return;
+	}
+	
+	public PointEntry get_point(int id) {
+		Cursor cursor = getReadableDatabase().rawQuery("select * from points where _id = ?", new String[] { id + "" });
+		PointEntry point = new PointEntry();
+		if (cursor.moveToFirst())
+		{	
+			point.setId(cursor.getInt(0));
+			point.setName(cursor.getString(1));
+		}
+		else
+			point = null;
+		return point;
 	}
 }
