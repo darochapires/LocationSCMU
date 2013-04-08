@@ -202,6 +202,7 @@ public class Calculator {
 			double parcels = 0;
 			while (results_it.hasNext())
 			{
+				Log.d("Calculator", "Calculating parcels");
 				APEntry result = results_it.next();
 				if (aps.containsKey(result.getMac_address()))
 				{

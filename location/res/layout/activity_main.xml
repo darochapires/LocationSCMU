@@ -55,28 +55,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="1" />
+            android:text="SE" />
 
         <RadioButton
             android:id="@+id/manhattan1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="2" />
+            android:text="SM" />
 
         <RadioButton
             android:id="@+id/euclidean_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="3" />
+            android:text="AE" />
 
         <RadioButton
             android:id="@+id/manhattan_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onRadioButtonClicked"
-            android:text="4" />
+            android:text="AM" />
     </RadioGroup>
 
     <TextView
@@ -97,9 +97,9 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/radioGroup1"
         android:layout_below="@+id/textview"
+        android:onClick="accuracy"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:onClick="accuracy"
         android:text="Calcular precisão" />
 
 </RelativeLayout>

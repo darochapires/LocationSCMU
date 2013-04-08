@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -40,10 +39,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		setContentView(R.layout.activity_main);
-
 
 		db = new DatabaseHelper(this);
 		calc = new Calculator(db);
@@ -198,8 +194,6 @@ public class MainActivity extends Activity {
 	}
 	
 	public void accuracy(View view) {
-		setProgressBarIndeterminateVisibility(Boolean.TRUE);
-		
 		if (selected_algorithm == 0)
 		{
 			Toast.makeText(getApplicationContext(), "Tens que seleccionar um algoritmo", Toast.LENGTH_SHORT).show();
@@ -217,7 +211,6 @@ public class MainActivity extends Activity {
 		else if (selected_algorithm == MANHATTAN_ALL)
 			accuracy = calc.accuracy(MANHATTAN_ALL, MANHATTAN);
 		
-		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		Toast.makeText(getApplicationContext(), "Precis‹o: " + accuracy*100 + "%", Toast.LENGTH_SHORT).show();
 	}
 }

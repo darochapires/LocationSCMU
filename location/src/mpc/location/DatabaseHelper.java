@@ -55,8 +55,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Log.w(DatabaseHelper.class.getName(),
 				"Upgrading database from version " + oldVersion + " to "
 						+ newVersion + ", which will destroy all old data");
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCESSPOINT);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINT);
+		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_ACCESSPOINT);
+		//db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINT);
 		onCreate(db);
 	}
 

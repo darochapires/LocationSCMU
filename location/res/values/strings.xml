@@ -9,14 +9,14 @@
         <![CDATA[
         <p>Este projecto visa calcular a posição do utilizador através de fingerprinting.
             Para tal são usados quatro algoritmos, sendo eles:</p>
-        <b>Algoritmo 1:</b>
+        <b>Algoritmo SE (Single Euclidean):</b>
         <p>Cálculo com a distância euclideana usando o AP com maior sinal;</p>
-        <b>Algoritmo 2:</b>
+        <b>Algoritmo SM (Single Manhattan):</b>
         <p>Cálculo com a distância de Manhattan usando o AP com maior sinal;</p>
       	
-        <strong>Algoritmo 3:</strong><br/>
+        <strong>Algoritmo AE (All Euclidean):</strong><br/>
         <p>Cálculo com a distância euclideana usando todos os APs;</p>
-        <strong>Algoritmo 4:</strong><br/>
+        <strong>Algoritmo AM (All Manhattan):</strong><br/>
         <p>Cálculo com a distância de Manhattan usando todos os APs;</p>
         <b>Projecto realizado por:</b>
         <p>Ana Gonçalves, nº 40611</p>
