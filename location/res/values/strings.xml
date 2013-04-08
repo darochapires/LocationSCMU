@@ -5,23 +5,22 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_track">WiFi</string>
     <string name="title_activity_about">WiFi</string>
-    <string name="about">Este projecto visa calcular a posição do utilizador através de fingerprinting. Para tal são usados quatro algoritmos, sendo eles:
-        \n\n
-        Algoritmo 1:\n
-        Cálculo com a distância euclideana usando o AP com maior sinal;\n
-        \n
-        Algoritmo 2:\n
-        Cálculo com a distância de Manhattan usando o AP com maior sinal;\n
-      	\n
-        Algoritmo 3:\n
-        Cálculo com a distância euclideana usando todos os APs;\n
-        \n
-        Algoritmo 4:\n
-        Cálculo com a distância de Manhattan usando todos os APs;\n
-        \n\n
-        Projecto realizado por:\n
-        Ana Gonçalves, nº 40611\n
-        Pedro Pires, nº X.</string>
+    <string name="about">
+        <![CDATA[
+        <p>Este projecto visa calcular a posição do utilizador através de fingerprinting.
+            Para tal são usados quatro algoritmos, sendo eles:</p>
+        <b>Algoritmo 1:</b>
+        <p>Cálculo com a distância euclideana usando o AP com maior sinal;</p>
+        <b>Algoritmo 2:</b>
+        <p>Cálculo com a distância de Manhattan usando o AP com maior sinal;</p>
+      	
+        <strong>Algoritmo 3:</strong><br/>
+        <p>Cálculo com a distância euclideana usando todos os APs;</p>
+        <strong>Algoritmo 4:</strong><br/>
+        <p>Cálculo com a distância de Manhattan usando todos os APs;</p>
+        <b>Projecto realizado por:</b>
+        <p>Ana Gonçalves, nº 40611</p>
+        <p>Pedro Pires, nº 40152</p>]]></string>
     <string name="save">Guardar</string>
 
     <string-array name="options_array">

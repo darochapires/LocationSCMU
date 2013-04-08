@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -39,12 +40,15 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		setProgressBarIndeterminateVisibility(Boolean.FALSE);
 		setContentView(R.layout.activity_main);
 
 
 		db = new DatabaseHelper(this);
 		calc = new Calculator(db);
 
+		selected_algorithm = 0;
 		manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		IntentFilter i = new IntentFilter();
 		i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -169,24 +173,51 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "Faz scan primeiro", Toast.LENGTH_SHORT).show();
 			return;
 		}
-
+		else if (selected_algorithm == 0)
+		{
+			Toast.makeText(getApplicationContext(), "Tens que seleccionar um algoritmo", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		List<ScanResult> results = manager.getScanResults();		
 		PointEntry point = new PointEntry();
 		
 		if (selected_algorithm == EUCLIDEAN_ONE)
-			point = calc.strongest_ap(results, EUCLIDEAN);			
+			point = calc.strongest_scan_ap(results, EUCLIDEAN);			
 		else if (selected_algorithm == MANHATTAN_ONE)
-			point = calc.strongest_ap(results, MANHATTAN);
+			point = calc.strongest_scan_ap(results, MANHATTAN);
 		else if (selected_algorithm == EUCLIDEAN_ALL)
-			point = calc.every_ap(results, EUCLIDEAN);
+			point = calc.every_scan_ap(results, EUCLIDEAN);
 		else if (selected_algorithm == MANHATTAN_ALL)
-			point = calc.every_ap(results, MANHATTAN);
-
+			point = calc.every_scan_ap(results, MANHATTAN);
 
 		
 		if (point == null)
 			Toast.makeText(getApplicationContext(), "Não foram detectadas localizações", Toast.LENGTH_SHORT).show();
 		else
 			Toast.makeText(getApplicationContext(), "You are at room " + point.getName(), Toast.LENGTH_SHORT).show();
+	}
+	
+	public void accuracy(View view) {
+		setProgressBarIndeterminateVisibility(Boolean.TRUE);
+		
+		if (selected_algorithm == 0)
+		{
+			Toast.makeText(getApplicationContext(), "Tens que seleccionar um algoritmo", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		int accuracy = 0;
+		
+		if (selected_algorithm == EUCLIDEAN_ONE)
+			accuracy = calc.accuracy(EUCLIDEAN_ONE, EUCLIDEAN);			
+		else if (selected_algorithm == MANHATTAN_ONE)
+			accuracy = calc.accuracy(MANHATTAN_ONE, MANHATTAN);
+		else if (selected_algorithm == EUCLIDEAN_ALL)
+			accuracy = calc.accuracy(EUCLIDEAN_ALL, EUCLIDEAN);
+		else if (selected_algorithm == MANHATTAN_ALL)
+			accuracy = calc.accuracy(MANHATTAN_ALL, MANHATTAN);
+		
+		setProgressBarIndeterminateVisibility(Boolean.FALSE);
+		Toast.makeText(getApplicationContext(), "Precisão: " + accuracy*100 + "%", Toast.LENGTH_SHORT).show();
 	}
 }

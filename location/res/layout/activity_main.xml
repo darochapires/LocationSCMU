@@ -12,7 +12,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="100dp"
         android:paddingLeft="20dp" >
-
     </TableLayout>
 
     <LinearLayout
@@ -43,6 +42,7 @@
     </LinearLayout>
 
     <RadioGroup
+        android:id="@+id/radioGroup1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textview"
@@ -93,11 +93,13 @@
 
     <Button
         android:id="@+id/button1"
-        style="@style/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textview"
+        android:layout_alignRight="@+id/radioGroup1"
         android:layout_below="@+id/textview"
-        android:text="Precisão" />
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:onClick="accuracy"
+        android:text="Calcular precisão" />
 
 </RelativeLayout>

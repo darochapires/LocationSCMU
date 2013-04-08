@@ -2,6 +2,7 @@ package mpc.location;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +101,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.insertOrThrow(TABLE_ACCESSPOINT, null, values);
 	}
 
-	public Map<Integer, List<APEntry>> getApPoints(String mac) {
+	public Map<Integer, List<APEntry>> getApPoints(String mac, int p_id) {
 
 		Map<Integer, List<APEntry>> result = new HashMap<Integer, List<APEntry>>();
 
@@ -115,25 +116,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			while (!ap_cursor.isAfterLast())
 			{
 				int point_id = ap_cursor.getInt(3);
-				ap_cursor.moveToNext();
+				if (p_id == -1 || point_id != p_id) 
+				{
+					ap_cursor.moveToNext();
 
-				Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
-						"select * from accesspoints where point_id = ? ;", new String[] { point_id + "" });
+					Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
+							"select * from accesspoints where point_id = ? ;", new String[] { point_id + "" });
 
-				if (aps_in_point_cursor.moveToFirst()) {
-					List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
-					while (!aps_in_point_cursor.isAfterLast())
-					{
-						APEntry ap_in_point_entry = new APEntry(
-								aps_in_point_cursor.getInt(0),
-								aps_in_point_cursor.getString(1),
-								aps_in_point_cursor.getString(2),
-								aps_in_point_cursor.getInt(3),
-								aps_in_point_cursor.getInt(4));
-						aps_in_point_list.add(ap_in_point_entry);
-						aps_in_point_cursor.moveToNext();
+					if (aps_in_point_cursor.moveToFirst()) {
+						List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
+						while (!aps_in_point_cursor.isAfterLast())
+						{
+							APEntry ap_in_point_entry = new APEntry(
+									aps_in_point_cursor.getInt(0),
+									aps_in_point_cursor.getString(1),
+									aps_in_point_cursor.getString(2),
+									aps_in_point_cursor.getInt(3),
+									aps_in_point_cursor.getInt(4));
+							aps_in_point_list.add(ap_in_point_entry);
+							aps_in_point_cursor.moveToNext();
+						}
+						result.put(point_id, aps_in_point_list);
 					}
-					result.put(point_id, aps_in_point_list);
 				}
 			}
 		}
@@ -147,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		for (int i = 0; i < results.size(); i++)
 		{
 			Cursor ap_cursor = getReadableDatabase().rawQuery(
-				"select * from accesspoints where macaddress = ? ;", new String[] { results.get(i).BSSID });
+					"select * from accesspoints where macaddress = ? ;", new String[] { results.get(i).BSSID });
 
 			// esta list vai ter todos os APs que estao na BD com o mesmo
 			// macaddress que os APs do scan, caso constem na BD
@@ -174,6 +178,75 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							aps_in_point_cursor.moveToNext();
 						}
 						result.put(point_id, aps_in_point_list);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<APEntry> getPointAps(int point_id) {
+
+		List<APEntry> result = new LinkedList<APEntry>();
+
+		Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
+				"select * from accesspoints where point_id = ?", new String[] { point_id + "" });
+
+		if (aps_in_point_cursor.moveToFirst()) {
+			List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
+			while (!aps_in_point_cursor.isAfterLast())
+			{
+				APEntry ap_in_point_entry = new APEntry(
+						aps_in_point_cursor.getInt(0),
+						aps_in_point_cursor.getString(1),
+						aps_in_point_cursor.getString(2),
+						aps_in_point_cursor.getInt(3),
+						aps_in_point_cursor.getInt(4));
+				aps_in_point_list.add(ap_in_point_entry);
+				aps_in_point_cursor.moveToNext();
+				result.add(ap_in_point_entry);
+			}
+		}
+		return result;
+	}
+
+	public Map<Integer, List<APEntry>> getPointsAps(List<APEntry> aps, int p_id)
+	{
+		Map<Integer, List<APEntry>> result = new HashMap<Integer, List<APEntry>>();
+
+		for (int i = 0; i < aps.size(); i++)
+		{
+			Cursor ap_cursor = getReadableDatabase().rawQuery(
+					"select * from accesspoints where macaddress = ? ;", new String[] { aps.get(i).getMac_address() });
+
+			// esta list vai ter todos os APs que estao na BD com o mesmo
+			// macaddress que os APs do scan, caso constem na BD
+			// se se obtiveram resultados...
+			if (ap_cursor.moveToFirst()) {
+				while (!ap_cursor.isAfterLast())
+				{
+					int point_id = ap_cursor.getInt(3);
+					if (point_id != p_id)
+					{
+						ap_cursor.moveToNext();
+						Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
+								"select * from accesspoints where point_id = ?", new String[] { point_id + "" });
+
+						if (aps_in_point_cursor.moveToFirst()) {
+							List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
+							while (!aps_in_point_cursor.isAfterLast())
+							{
+								APEntry ap_in_point_entry = new APEntry(
+										aps_in_point_cursor.getInt(0),
+										aps_in_point_cursor.getString(1),
+										aps_in_point_cursor.getString(2),
+										aps_in_point_cursor.getInt(3),
+										aps_in_point_cursor.getInt(4));
+								aps_in_point_list.add(ap_in_point_entry);
+								aps_in_point_cursor.moveToNext();
+							}
+							result.put(point_id, aps_in_point_list);
+						}
 					}
 				}
 			}
