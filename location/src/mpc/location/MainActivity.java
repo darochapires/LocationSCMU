@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import android.R.color;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +28,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 
 public class MainActivity extends Activity {
 	private DatabaseHelper db;
@@ -36,7 +39,11 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		//Button button = (Button) findViewById(R.id.button1);
+		//button.getBackground().setColorFilter(Color.DKGRAY, PorterDuff.Mode.MULTIPLY);
+		//button.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, 0xFFAA0000));
 
+		
 		db = new DatabaseHelper(this);
 
 		manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -50,6 +57,7 @@ public class MainActivity extends Activity {
 
 				java.util.List<ScanResult> res = manager.getScanResults();
 				java.util.Iterator<ScanResult> it = res.iterator();
+
 				while (it.hasNext()) {
 					ScanResult r = it.next();
 					TableRow row = new TableRow(table.getContext());
@@ -113,19 +121,19 @@ public class MainActivity extends Activity {
 	/** Called when the user clicks the Scan Now button */
 	public void scan(View view) {
 		// Do something in response to button
-		// if (manager.isWifiEnabled()) {
-		manager.startScan();
-		/*
-		 * } else { Context context = getApplicationContext(); CharSequence text
-		 * = "Please, turn the Wifi on."; int duration = Toast.LENGTH_SHORT;
-		 * 
-		 * Toast toast = Toast.makeText(context, text, duration); toast.show();
-		 * }
-		 */
+		if (manager.isWifiEnabled()) {
+			manager.startScan();
+		
+		 } else { 
+			 Context context = getApplicationContext();
+			 CharSequence text = "Please, turn the Wifi on."; int duration = Toast.LENGTH_SHORT;
+			 Toast toast = Toast.makeText(context, text, duration); toast.show();
+		 }
+		 
 	}
 
 	// Método para mostrar a caixa de texto
-	public void insert(View view) {
+	/*public void insert(View view) {
 		EditText editText = (EditText) findViewById(R.id.editText1);
 		Button button = (Button) findViewById(R.id.button3);
 		if (editText.getVisibility() == View.VISIBLE) {
@@ -135,10 +143,10 @@ public class MainActivity extends Activity {
 			editText.setVisibility(View.VISIBLE);
 			button.setVisibility(View.VISIBLE);
 		}
-	}
+	}*/
 
 	// Método para guardar a localização dada pelo utilizador
-	public void save(View view) {
+	/*public void save(View view) {
 		EditText editText = (EditText) findViewById(R.id.editText1);
 
 		// C—digo manhoso que encontrei na net para esconder o teclado :P
@@ -164,7 +172,7 @@ public class MainActivity extends Activity {
 		// Mensagem de sucesso
 		Toast.makeText(getApplicationContext(), point + " successfuly added! " + point_id,
 				Toast.LENGTH_SHORT).show();
-	}
+	}*/
 
 	// Distancia Euclideana
 	public long euclidean(long x1, long x2, long y1, long y2) {

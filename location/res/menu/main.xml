@@ -2,20 +2,20 @@
 
     <item
         android:id="@+id/action_loc"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom|withText"
+        
+        android:showAsAction="always"
         android:title="Localizar"
         />
     
     <item
         android:id="@+id/action_point"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always"
         android:title="Guardar Pontos">
     </item>
     <item
         android:id="@+id/action_about"
         
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always"
         android:title="Sobre">
     </item>
 
