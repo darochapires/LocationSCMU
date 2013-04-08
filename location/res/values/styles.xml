@@ -24,8 +24,8 @@
         <item name="android:background">#222222</item>
     </style>
 
-    <style name="layout">
-        <item name="android:background">#C0C0C0</item>
+    <style name="text">
+        <item name="android:background">#5882FA</item>
     </style>
 
 </resources>

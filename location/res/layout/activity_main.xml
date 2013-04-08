@@ -5,38 +5,99 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp" >
 
-         <TableLayout
-             android:id="@+id/table"
-             android:layout_width="fill_parent"
-             android:layout_height="362dp"
-             android:layout_alignParentTop="true"
-             android:layout_marginTop="53dp" >
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="fill_parent"
+        android:layout_height="362dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:paddingLeft="20dp" >
 
-        </TableLayout>
+    </TableLayout>
 
-        <LinearLayout
-            style="?android:attr/buttonBarStyle"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/footer"
+        style="@style/button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/scan"
+            style="@style/button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:layout_weight="1"
+            android:onClick="scan"
+            android:text="Scan" />
 
-            <Button
-                android:id="@+id/button1"
-                style="@style/button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="scan"
-                android:text="Scan" />
+        <Button
+            android:id="@+id/calc"
+            style="@style/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="calc"
+            android:text="Localizar" />
+    </LinearLayout>
 
-            <Button
-                android:id="@+id/button2"
-                style="@style/button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="calc"
-                android:text="Localizar" />
-        </LinearLayout>
- 
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textview"
+        android:layout_marginLeft="17dp"
+        android:layout_toRightOf="@+id/textview"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/euclidean1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="1" />
+
+        <RadioButton
+            android:id="@+id/manhattan1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="2" />
+
+        <RadioButton
+            android:id="@+id/euclidean_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="3" />
+
+        <RadioButton
+            android:id="@+id/manhattan_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
+            android:text="4" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="24dp"
+        android:text="Algoritmo:"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/button1"
+        style="@style/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textview"
+        android:layout_below="@+id/textview"
+        android:text="Precisão" />
+
 </RelativeLayout>

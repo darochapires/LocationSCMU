@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Location</string>
+    <string name="app_name">WiFi</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    
-    <string name="options_prompt">Escolher...</string>
-    
-    <string-array name="options">
-        <item>Localizar</item>
-        <item>Marcar pontos</item>
-        <item>Sobre</item>
+    <string name="title_activity_track">WiFi</string>
+    <string name="title_activity_about">WiFi</string>
+    <string name="about">Este projecto visa calcular a posição do utilizador através de fingerprinting. Para tal são usados quatro algoritmos, sendo eles:
+        \n\n
+        Algoritmo 1:\n
+        Cálculo com a distância euclideana usando o AP com maior sinal;\n
+        \n
+        Algoritmo 2:\n
+        Cálculo com a distância de Manhattan usando o AP com maior sinal;\n
+      	\n
+        Algoritmo 3:\n
+        Cálculo com a distância euclideana usando todos os APs;\n
+        \n
+        Algoritmo 4:\n
+        Cálculo com a distância de Manhattan usando todos os APs;\n
+        \n\n
+        Projecto realizado por:\n
+        Ana Gonçalves, nº 40611\n
+        Pedro Pires, nº X.</string>
+    <string name="save">Guardar</string>
+
+    <string-array name="options_array">
+        <item>Euclediana com o AP mais forte</item>
+        <item>Manhattan com o AP mais forte</item>
+        <item>Euclediana com todos os APs</item>
+        <item>Manhattan com todos os APs</item>
     </string-array>
 
+    <string name="prompt">Algoritmo</string>
 </resources>
