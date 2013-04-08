@@ -2,11 +2,9 @@ package mpc.location;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,11 +12,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.wifi.ScanResult;
 import android.util.Log;
-import android.util.Pair;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-
-	private int current_point_id;
 
 	public static final String COLUMN_ID = "_id";
 
@@ -50,7 +45,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		current_point_id = 0;
 		db.execSQL(CREATE_ACCESSPOINT);
 		db.execSQL(CREATE_POINT);
 	}
@@ -67,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	// Método para inserir o AP e a respectiva Leitura
 	public void insert_ap(String mac_address, String network_name,
-			int strength, int point_id) {
+			int strength, long point_id) {
 
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = new ContentValues();
@@ -101,8 +95,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		// se se obtiveram resultados...
 		if (ap_cursor.moveToFirst()) {
 			List<Integer> points = new ArrayList<Integer>();
-			for (int i = 0; i < ap_cursor.getCount(); i++) {
+			while (!ap_cursor.isAfterLast())
+			{
 				points.add(ap_cursor.getInt(3));
+				ap_cursor.moveToNext();
 			}
 
 			// 2º obter os pontos onde estes APs constam
@@ -118,7 +114,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				if (aps_in_point_cursor.moveToFirst()) {
 					List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
-					for (int j = 0; j < aps_in_point_cursor.getCount(); j++) {
+					while (!aps_in_point_cursor.isAfterLast())
+					{
 						APEntry ap_in_point_entry = new APEntry(
 								aps_in_point_cursor.getInt(0),
 								aps_in_point_cursor.getString(1),
@@ -126,6 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 								aps_in_point_cursor.getInt(3),
 								aps_in_point_cursor.getInt(4));
 						aps_in_point_list.add(ap_in_point_entry);
+						aps_in_point_cursor.moveToNext();
 					}
 					result.put(point_id, aps_in_point_list);
 				}
@@ -134,28 +132,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return result;
 	}
 
-	public int insert_point(String point) {
+	public long insert_point(String point) {
 		// obtem os pontos com o nome "point"
-		Cursor cursor = getReadableDatabase().rawQuery(
-				"select * from points where point_name = ?",
-				new String[] { point });
-
 		SQLiteDatabase db = getWritableDatabase();
 		ContentValues values = new ContentValues();
-		values.clear();
-
-		int id_to_return;
-		// if existe...
-		if (cursor.moveToFirst()) {
-			id_to_return = cursor.getInt(0);
-		} else {
-			// Se nao existe, guardar em BD
-			values.put(POINT_NAME, point);
-			db.insertOrThrow(TABLE_POINT, null, values);
-			// actualizar o contador do point_id
-			current_point_id++;
-			id_to_return = current_point_id;
-		}
+		
+		// Se nao existe, guardar em BD
+		values.put(POINT_NAME, point);
+		long id_to_return = db.insertOrThrow(TABLE_POINT, null, values);
+		
 		return id_to_return;
 	}
 	

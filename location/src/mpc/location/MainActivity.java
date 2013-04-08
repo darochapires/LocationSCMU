@@ -8,13 +8,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Pair;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +27,6 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.net.wifi.*;
 
 public class MainActivity extends Activity {
 	private DatabaseHelper db;
@@ -148,7 +148,7 @@ public class MainActivity extends Activity {
 		// Obter o texto inserido
 		String point = editText.getText().toString();
 
-		int point_id = db.insert_point(point);
+		long point_id = db.insert_point(point);
 
 		// Obter os resultados do scan
 		manager.startScan();
@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
 		}
 
 		// Mensagem de sucesso
-		Toast.makeText(getApplicationContext(), point + " successfuly added!",
+		Toast.makeText(getApplicationContext(), point + " successfuly added! " + point_id,
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -184,6 +184,7 @@ public class MainActivity extends Activity {
 		double distance = 0;
 		int min_point = 0;
 		// Obter os APs
+		
 		manager.startScan();
 		List<ScanResult> results = manager.getScanResults();
 		//Obter leitura ordenada por força de sinal
