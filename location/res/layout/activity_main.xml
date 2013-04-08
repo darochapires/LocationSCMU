@@ -45,9 +45,9 @@
         android:id="@+id/radioGroup1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/textview"
-        android:layout_marginLeft="17dp"
-        android:layout_toRightOf="@+id/textview"
+        android:layout_marginRight="21dp"
         android:orientation="horizontal" >
 
         <RadioButton
@@ -80,23 +80,29 @@
     </RadioGroup>
 
     <TextView
-        android:id="@+id/textview"
+        android:id="@+id/textview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
         android:text="Algoritmo:"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    
+    <TextView
+        android:id="@+id/textview2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/footer"
+        android:layout_margin="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/radioGroup1"
-        android:layout_below="@+id/textview"
+        android:layout_below="@+id/textview1"
         android:onClick="accuracy"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"

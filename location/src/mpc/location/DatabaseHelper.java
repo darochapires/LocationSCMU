@@ -109,6 +109,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				"select * from accesspoints where macaddress = ? ;",
 				new String[] { mac });
 
+		Log.d("getApPoints", "antes do while");
 		// esta list vai ter todos os APs que estao na BD com o mesmo
 		// macaddress que os APs do scan, caso constem na BD
 		// se se obtiveram resultados...
@@ -116,13 +117,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			while (!ap_cursor.isAfterLast())
 			{
 				int point_id = ap_cursor.getInt(3);
+				Log.d("getApPoints", "id do point: " + point_id);
+				ap_cursor.moveToNext();
 				if (p_id == -1 || point_id != p_id) 
 				{
-					ap_cursor.moveToNext();
-
+					Log.d("getApPoints", "=========== antes de obter os APs do ponto");
 					Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
 							"select * from accesspoints where point_id = ? ;", new String[] { point_id + "" });
 
+					Log.d("getApPoints", "============= depois da query");
 					if (aps_in_point_cursor.moveToFirst()) {
 						List<APEntry> aps_in_point_list = new ArrayList<APEntry>();
 						while (!aps_in_point_cursor.isAfterLast())
@@ -136,6 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							aps_in_point_list.add(ap_in_point_entry);
 							aps_in_point_cursor.moveToNext();
 						}
+						Log.d("getApPoints", "============ antes de guardar o AP");
 						result.put(point_id, aps_in_point_list);
 					}
 				}
@@ -226,9 +230,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				while (!ap_cursor.isAfterLast())
 				{
 					int point_id = ap_cursor.getInt(3);
+					ap_cursor.moveToNext();
 					if (point_id != p_id)
 					{
-						ap_cursor.moveToNext();
 						Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(
 								"select * from accesspoints where point_id = ?", new String[] { point_id + "" });
 
