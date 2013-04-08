@@ -24,21 +24,24 @@
 
         <Button
             android:id="@+id/scan"
-            style="@style/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:hapticFeedbackEnabled="true"
             android:onClick="scan"
-            android:text="Scan" />
+            android:text="Scan"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/save"
-            style="@style/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:onClick="save"
-            android:text="@string/save" />
+            android:text="@string/save"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
     <EditText
@@ -48,9 +51,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:ems="10"
-        android:paddingTop="30dp"
         android:hint="Inserir localização"
-        android:inputType="text" >
+        android:inputType="text"
+        android:paddingTop="30dp" >
 
         <requestFocus />
     </EditText>

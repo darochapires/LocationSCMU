@@ -13,7 +13,6 @@
     </item>
     <item
         android:id="@+id/action_about"
-        
         android:showAsAction="always"
         android:title="Sobre">
     </item>
