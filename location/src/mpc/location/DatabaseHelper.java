@@ -119,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				int point_id = ap_cursor.getInt(3);
 				Log.d("getApPoints", "id do point: " + point_id);
 				ap_cursor.moveToNext();
-				if (p_id == -1 || point_id != p_id) 
+				if (p_id < 0 || point_id != p_id) 
 				{
 					Log.d("getApPoints", "=========== antes de obter os APs do ponto");
 					Cursor aps_in_point_cursor = getReadableDatabase().rawQuery(

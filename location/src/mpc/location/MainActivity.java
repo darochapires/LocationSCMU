@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RadioButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -119,8 +118,7 @@ public class MainActivity extends Activity {
 
 	public void onRadioButtonClicked(View view) {
 		// Is the button now checked?
-		boolean checked = ((RadioButton) view).isChecked();
-
+		
 		// Check which radio button was clicked
 		switch(view.getId()) {
 		case R.id.euclidean1:
@@ -174,6 +172,8 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "Tens que seleccionar um algoritmo", Toast.LENGTH_SHORT).show();
 			return;
 		}
+		TextView text = (TextView) findViewById(R.id.textview2);
+		
 		List<ScanResult> results = manager.getScanResults();		
 		PointEntry point = new PointEntry();
 
@@ -186,8 +186,6 @@ public class MainActivity extends Activity {
 		else if (selected_algorithm == MANHATTAN_ALL)
 			point = calc.every_scan_ap(results, MANHATTAN);
 
-
-		TextView text = (TextView) findViewById(R.id.textview2);
 
 		if (point == null)
 			text.setText("Localização: Não foi detectada nenhuma localização");
@@ -202,7 +200,7 @@ public class MainActivity extends Activity {
 			return;
 		}
 
-		int accuracy = 0;
+		double accuracy = 0;
 
 		if (selected_algorithm == EUCLIDEAN_ONE)
 			accuracy = calc.accuracy(EUCLIDEAN_ONE, EUCLIDEAN);			
@@ -213,9 +211,7 @@ public class MainActivity extends Activity {
 		else if (selected_algorithm == MANHATTAN_ALL)
 			accuracy = calc.accuracy(MANHATTAN_ALL, MANHATTAN);
 
-
 		TextView text = (TextView) findViewById(R.id.textview2);
-
-		text.setText("Precisão: " + accuracy*100 + "%");
+		text.setText("Precisão: " + Math.round(accuracy*100) + "%");
 	}
 }

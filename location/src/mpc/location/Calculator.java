@@ -39,7 +39,7 @@ public class Calculator {
 
 		ScanResult strongest = sortedResults.get(0);
 
-		Map<Integer, List<APEntry>> aps_per_point = db.getApPoints(strongest.BSSID, -1);
+		Map<Integer, List<APEntry>> aps_per_point = db.getApPoints(strongest.BSSID, -100);
 		Iterator<Integer> point_it = aps_per_point.keySet().iterator();
 
 		while (point_it.hasNext())
@@ -144,9 +144,9 @@ public class Calculator {
 		return point;
 	}
 
-	public int accuracy(int choose_algorithm, int distance_algorithm) {
-		int count = 0;
-		int accuracy = 0;
+	public double accuracy(int choose_algorithm, int distance_algorithm) {
+		double count = 0;
+		double accuracy = 0;
 		Cursor point_cursor = db.getReadableDatabase().rawQuery("select * from points", null);
 		if (point_cursor.moveToFirst())
 		{

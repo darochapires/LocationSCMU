@@ -105,13 +105,11 @@
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/radioGroup1"
-        android:layout_below="@+id/textview1"
+        android:layout_below="@+id/radioGroup1"
+        android:layout_alignParentRight="true"
         android:onClick="accuracy"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:textColor="@android:color/white"
-        android:background="?android:attr/selectableItemBackground"
         android:text="Calcular precisão" />
 
 
